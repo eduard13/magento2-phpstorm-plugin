@@ -12,6 +12,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.php.fix.PhpImplementResolverClassQuickFix;
 import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUsagesCollector;
 import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUtil;
@@ -21,11 +22,11 @@ import java.util.List;
 
 public class GraphQlResolverInspection extends PhpInspection {
 
-    public static final String GraphQlResolverProblemDescription = "Class must implements \\Magento\\Framework\\GraphQl\\Query\\ResolverInterface";
-
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
+        InspectionBundle inspectionBundle = new InspectionBundle();
+
         return new PhpElementVisitor() {
             public void visitPhpClass(PhpClass resolverClass) {
                 List<? extends PsiElement> results;
@@ -36,9 +37,10 @@ public class GraphQlResolverInspection extends PhpInspection {
                         PsiElement currentClassNameIdentifier = resolverClass.getNameIdentifier();
                         assert currentClassNameIdentifier != null;
                         problemsHolder.registerProblem(currentClassNameIdentifier,
-                                GraphQlResolverProblemDescription,
-                                ProblemHighlightType.ERROR,
-                                new PhpImplementResolverClassQuickFix());
+                            inspectionBundle.message("inspection.class.hierarchyImplementationCheck", "\\Magento\\Framework\\GraphQl\\Query\\ResolverInterface"),
+                            ProblemHighlightType.ERROR,
+                            new PhpImplementResolverClassQuickFix()
+                        );
                     }
                 }
             }
